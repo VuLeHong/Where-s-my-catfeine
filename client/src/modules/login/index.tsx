@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 export default function LoginPage() {
@@ -32,10 +33,10 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="mt-4 text-sm text-center text-gray-600">
-          Don't have an account?{" "}
-          <a href="/register" className="text-blue-500 hover:underline">
+          Do not have an account?{" "}
+          <Link href={'/signup'} className="text-blue-500 hover:underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>

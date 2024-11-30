@@ -4,6 +4,7 @@ import pic2 from '../../utils/cafeshop2.jpeg';
 import pic3 from '../../utils/cafeshop3.jpeg';
 import Dropdown from '../dropdown';
 import { HeartIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 export default function HomePage() {
   return (
@@ -11,7 +12,7 @@ export default function HomePage() {
       <header className="bg-white p-4 shadow-md z-10">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="text-xl font-bold text-red-500">
-            Where's my cafein
+            <Link href={'/'}> Where is my cafein</Link>
           </div>
           <div className="flex items-center space-x-4">
             <input
@@ -24,8 +25,8 @@ export default function HomePage() {
             </button>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-gray-800">Sign up</button>
-            <button className="text-gray-600 hover:text-gray-800">Log in</button>
+            <button className="text-gray-600 hover:text-gray-800"><Link href={'/signup'}>Sign up</Link></button>
+            <button className="text-gray-600 hover:text-gray-800"><Link href={'/login'}>Log in</Link></button>
           </div>
           <Dropdown />
         </div>
@@ -104,7 +105,7 @@ export default function HomePage() {
       </main>
       <footer className="bg-gray-800 text-white py-6">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <p>&copy; 2024 Where's my cafein. All rights reserved.</p>
+          <p>&copy; 2024 Where is my cafein. All rights reserved.</p>
         </div>
       </footer>
     </div>
