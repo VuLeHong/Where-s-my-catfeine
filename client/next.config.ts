@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+// next.config.ts
+
+import { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  images: {
+    domains: ['maps.googleapis.com'],
+  },
+}
 
 export default nextConfig;
