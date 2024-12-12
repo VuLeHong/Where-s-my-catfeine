@@ -4,11 +4,17 @@ import Link from 'next/link';
 import Dropdown from '../dropdown';
 import { WishlistPopup } from "../wishlist_popup";
 import { Heart } from '@/components/ui/Heart';
-import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Navigation, Pagination } from 'swiper/modules';
+import Image from "next/image";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 interface DetailPageProps {
   placeId: string;
@@ -91,37 +97,65 @@ export default function DetailPage({ placeId }: DetailPageProps) {
         <section className="flex flex-col items-center">
           <div className="flex items-center justify-between w-full mb-4">
             <h1 className="text-4xl font-bold text-gray-800 text-center">{shopDetails.name}</h1>
-            <button onClick={handlePopupOpen}><Heart /></button>
+            <button onClick={handlePopupOpen} ><Heart /></button>
           </div>
           {shopDetails.photos && shopDetails.photos.length > 0 && (
-            <Swiper
-              modules={[Navigation, Pagination]}
-              navigation
-              pagination={{ clickable: true }}
-              spaceBetween={16}
-              slidesPerView={1}
-              loop={true}
-              autoplay={{
-                delay: 3000,
-                disableOnInteraction: true,
+            // <Swiper
+            //   modules={[Navigation, Pagination]}
+            //   navigation
+            //   pagination={{ clickable: true }}
+            //   spaceBetween={16}
+            //   slidesPerView={1}
+            //   loop={true}
+            //   autoplay={{
+            //     delay: 3000,
+            //     disableOnInteraction: true,
+            //   }}
+            //   speed={500}
+            //   className="rounded-lg w-full max-w-lg"
+            // >
+            //   {shopDetails.photos.map((photo, index) => (
+            //     <SwiperSlide key={index}>
+            //       <Image
+            //         src={photo.getUrl({ maxWidth: 450, maxHeight: 450 })}
+            //         alt={`${shopDetails.name} - Photo ${index + 1}`}
+            //         className="w-full h-auto object-cover rounded-lg"
+            //         width={400}
+            //         height={400}
+            //       />
+            //     </SwiperSlide>
+            //   ))}
+            // </Swiper>
+            <Carousel
+              opts={{
+                align: "start",
               }}
-              speed={500}
-              className="rounded-lg w-full max-w-lg"
+              className="w-full max-w-7xl mx-auto "
             >
+              <CarouselContent >
               {shopDetails.photos.map((photo, index) => (
-                <SwiperSlide key={index}>
-                  <img
-                    src={photo.getUrl({ maxWidth: 900, maxHeight: 900 })}
-                    alt={`${shopDetails.name} - Photo ${index + 1}`}
-                    className="w-full h-auto object-cover rounded-lg"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                    <div className="p-1">
+                          <span className="text-3xl font-semibold">
+                            <Image
+                              src={photo.getUrl({ maxWidth: 450, maxHeight: 450 })}
+                              alt={`${shopDetails.name} - Photo ${index + 1}`}
+                              className=" h-60 object-cover rounded-lg"
+                              width={400}
+                              height={400}
+                            />
+                          </span>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           )}
         </section>
 
-        <section className="flex gap-8">
+        <section className="flex  flex-col gap-8">
           <div className="flex-1">
             <div>
               <h2 className="text-2xl font-semibold text-gray-800">Address</h2>
@@ -139,7 +173,7 @@ export default function DetailPage({ placeId }: DetailPageProps) {
             )}
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 w-2/3">
             <h2 className="text-2xl font-semibold text-gray-800">Reviews</h2>
             {nonEmptyReviews.length > 0 ? (
               <ul className="space-y-4 mt-4">
@@ -159,6 +193,7 @@ export default function DetailPage({ placeId }: DetailPageProps) {
               <p className="text-gray-500">No reviews available</p>
             )}
           </div>
+
         </section>
       </main>
 
