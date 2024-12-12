@@ -155,95 +155,95 @@ export default function HomePage() {
     return '/default-cafe-image.jpg';
   };
 
-    return (
-      <div className="bg-gray-100 min-h-screen flex flex-col relative">
-        <header className="bg-white p-4 shadow-md z-10">
-          <div className="max-w-6xl mx-auto flex justify-between items-center">
-            <div className="text-xl font-bold text-red-500">
-              <Link href={"/"}>Where is my cafein</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Tìm kiếm"
-                className="p-2 border rounded-full w-64 text-black"
-              />
-              <button className="bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600">
-                Tìm kiếm
-              </button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="text-gray-600 hover:text-gray-800">
-                <Link href={'/signup'}>Sign up</Link>
-              </button>
-              <button className="text-gray-600 hover:text-gray-800">
-                <Link href={'/login'}>Log in</Link>
-              </button>
-            </div>
-            <Dropdown />
+  return (
+    <div className="bg-gray-100 min-h-screen flex flex-col relative">
+      <header className="bg-white p-4 shadow-md z-10">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="text-xl font-bold text-red-500">
+            <Link href={"/"}>Where is my cafein</Link>
           </div>
-        </header>
+          <div className="flex items-center space-x-4">
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Tìm kiếm"
+              className="p-2 border rounded-full w-64 text-black"
+            />
+            <button className="bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600">
+              Tìm kiếm
+            </button>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="text-gray-600 hover:text-gray-800">
+              <Link href={'/signup'}>Đăng Ký</Link>
+            </button>
+            <button className="text-gray-600 hover:text-gray-800">
+              <Link href={'/login'}>Đăng Nhập</Link>
+            </button>
+          </div>
+          <Dropdown />
+        </div>
+      </header>
         
-        <main className="flex-grow py-8 bg-gray-200 flex">
-          <div className="w-1/4 p-4 overflow-y-auto h-[calc(100vh-64px)]">
-            <h2 className="text-3xl font-semibold mb-8 text-black">Nổi bật</h2>
-            <div className="space-y-6">
-            {coffeeShops.map((shop, index) => (
-              <div
-                key={index}
-                className="bg-white shadow-lg rounded-lg overflow-hidden relative cursor-pointer"
-                onClick={() => focusOnPlace(shop)}
-              >
-                <div className="relative">
-                  <Image
-                    src={getPlaceImageUrl(shop.photos)}
-                    alt={`Image of ${shop.name}`}
-                    width={400}
-                    height={400}
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-black font-semibold">{shop.name}</h3>
-                  <p className="text-gray-500">{shop.vicinity}</p>
-                  {shop.rating && <p className="text-gray-500">Rating: {shop.rating}</p>}
-                  {shop.user_ratings_total && (
-                    <p className="text-gray-500">Total Ratings: {shop.user_ratings_total}</p>
-                  )}
-                  <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                    <a
-                      href={`/detail/${shop.place_id}`}
-                      className="text-blue-500"
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label={`More details about ${shop.name}`}
-                    >
-                      More
-                    </a>
-                    <button
-                      className="text-red-500"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsWishlistOpen(true);
-                      }}
-                    >
-                      <Heart />
-                    </button>
-                  </div>
+      <main className="flex-grow py-8 bg-gray-200 flex">
+        <div className="w-2/5 p-4 overflow-y-auto h-[calc(100vh-64px)]">
+          <h2 className="text-3xl font-semibold mb-8 text-black">Nổi bật</h2>
+          <div className="space-y-6">
+          {coffeeShops.map((shop, index) => (
+            <div
+              key={index}
+              className="bg-white shadow-lg rounded-lg overflow-hidden relative cursor-pointer"
+              onClick={() => focusOnPlace(shop)}
+            >
+              <div className="relative">
+                <Image
+                  src={getPlaceImageUrl(shop.photos)}
+                  alt={`Image of ${shop.name}`}
+                  width={700}
+                  height={700}
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-black font-semibold">{shop.name}</h3>
+                <p className="text-gray-500">{shop.vicinity}</p>
+                {shop.rating && <p className="text-gray-500">Rating: {shop.rating}</p>}
+                {shop.user_ratings_total && (
+                  <p className="text-gray-500">Total Ratings: {shop.user_ratings_total}</p>
+                )}
+                <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                  <a
+                    href={`/detail/${shop.place_id}`}
+                    className="text-blue-500"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`More details about ${shop.name}`}
+                  >
+                    More
+                  </a>
+                  <button
+                    className="text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsWishlistOpen(true);
+                    }}
+                  >
+                    <Heart />
+                  </button>
                 </div>
               </div>
-            ))}
             </div>
+          ))}
           </div>
-          <div className="w-3/4 p-4" ref={mapRef} style={{ height: 'calc(100vh - 64px)' }} />
-        </main>
+        </div>
+        <div ref={mapRef} className="w-3/5 p-4" />
+      </main>
 
-        <footer className="bg-gray-800 text-white py-6">
-          <div className="max-w-6xl mx-auto px-4 text-center">
-            <p>&copy; 2024 Where is my cafein. All rights reserved.</p>
-          </div>
-        </footer>
-        <WishlistPopup isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
-      </div>
+      <footer className="bg-gray-800 text-white py-6">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <p>&copy; 2024 Where is my cafein. All rights reserved.</p>
+        </div>
+      </footer>
+      <WishlistPopup isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
+    </div>
     );
   }
