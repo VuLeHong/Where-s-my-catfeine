@@ -4,6 +4,11 @@ import Link from 'next/link';
 import Dropdown from '../dropdown';
 import { WishlistPopup } from "../wishlist_popup";
 import { Heart } from '@/components/ui/Heart';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination } from 'swiper/modules';
 
 interface DetailPageProps {
   placeId: string;
@@ -69,6 +74,8 @@ export default function DetailPage({ placeId }: DetailPageProps) {
 
   const openingHours = shopDetails.opening_hours?.periods?.[0];
 
+  const nonEmptyReviews = shopDetails.reviews?.filter(review => review.text?.trim() !== '') || [];
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <header className="bg-white p-4 shadow-md sticky top-0 z-10">
@@ -81,72 +88,78 @@ export default function DetailPage({ placeId }: DetailPageProps) {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 flex flex-col gap-8 mt-6 pb-12">
-        <section className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-4xl font-bold text-gray-800">{shopDetails.name}</h1>
-              <button onClick={handlePopupOpen}><Heart /></button>
-            </div>
-            {shopDetails.photos && shopDetails.photos.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {shopDetails.photos.map((photo, index) => (
+        <section className="flex flex-col items-center">
+          <div className="flex items-center justify-between w-full mb-4">
+            <h1 className="text-4xl font-bold text-gray-800 text-center">{shopDetails.name}</h1>
+            <button onClick={handlePopupOpen}><Heart /></button>
+          </div>
+          {shopDetails.photos && shopDetails.photos.length > 0 && (
+            <Swiper
+              modules={[Navigation, Pagination]}
+              navigation
+              pagination={{ clickable: true }}
+              spaceBetween={16}
+              slidesPerView={1}
+              loop={true}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: true,
+              }}
+              speed={500}
+              className="rounded-lg w-full max-w-lg"
+            >
+              {shopDetails.photos.map((photo, index) => (
+                <SwiperSlide key={index}>
                   <img
-                    key={index}
                     src={photo.getUrl({ maxWidth: 900, maxHeight: 900 })}
                     alt={`${shopDetails.name} - Photo ${index + 1}`}
-                    className="rounded-lg w-full h-auto object-cover"
+                    className="w-full h-auto object-cover rounded-lg"
                   />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800">Address</h2>
-            <p className="text-gray-600">{shopDetails.formatted_address || 'No description available.'}</p>
-          </div>
-          {openingHours && (
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-800">Opening Hours</h2>
-              <p className="text-gray-600">
-                {openingHours.open?.time && openingHours.close?.time
-                  ? `${formatTime(openingHours.open.time)} - ${formatTime(openingHours.close.time)}`
-                  : 'Not available'}
-              </p>
-            </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           )}
         </section>
 
-        {shopDetails.reviews && shopDetails.reviews.length > 0 && (
-          <section className="flex flex-col gap-4">
-            <h2 className="text-2xl font-semibold text-gray-800">Reviews</h2>
-            {shopDetails.rating !== undefined ? (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold text-yellow-500">
-                  {shopDetails.rating}⭐
-                </span>
-                <span className="text-gray-500">({shopDetails.user_ratings_total} ratings)</span>
+        <section className="flex gap-8">
+          <div className="flex-1">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">Address</h2>
+              <p className="text-gray-600">{shopDetails.formatted_address || 'No description available.'}</p>
+            </div>
+            {openingHours && (
+              <div className="mt-4">
+                <h2 className="text-2xl font-semibold text-gray-800">Opening Hours</h2>
+                <p className="text-gray-600">
+                  {openingHours.open?.time && openingHours.close?.time
+                    ? `${formatTime(openingHours.open.time)} - ${formatTime(openingHours.close.time)}`
+                    : 'Not available'}
+                </p>
               </div>
-            ) : (
-              <p className="text-gray-500">No rating available</p>
             )}
-            <ul className="space-y-4">
-              {shopDetails.reviews.map((review, index) => (
-                <li key={index} className="bg-gray-50 p-4 rounded-lg shadow-md">
-                  <div className="flex items-center">
-                    <div className="text-yellow-500">
-                      {review.rating}⭐
+          </div>
+
+          <div className="flex-1">
+            <h2 className="text-2xl font-semibold text-gray-800">Reviews</h2>
+            {nonEmptyReviews.length > 0 ? (
+              <ul className="space-y-4 mt-4">
+                {nonEmptyReviews.map((review, index) => (
+                  <li key={index} className="bg-white p-4 rounded-lg shadow-md">
+                    <div className="flex items-center">
+                      <div className="text-yellow-500">
+                        {review.rating}⭐
+                      </div>
+                      <p className="ml-2 text-sm text-gray-500">{review.author_name}</p>
                     </div>
-                    <p className="ml-2 text-sm text-gray-500">{review.author_name}</p>
-                  </div>
-                  <p className="mt-2 text-gray-700">{review.text}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+                    <p className="mt-2 text-gray-700">{review.text}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">No reviews available</p>
+            )}
+          </div>
+        </section>
       </main>
 
       <footer className="bg-gray-800 text-white py-6 mt-auto">
