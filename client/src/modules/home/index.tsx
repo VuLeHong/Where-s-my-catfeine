@@ -7,6 +7,7 @@ import Link from "next/link";
 import { WishlistPopup } from "../wishlist_popup";
 import { Heart } from "@/components/ui/Heart";
 import { Loader } from '@googlemaps/js-api-loader';
+import { MapPin } from 'lucide-react';
 
 export default function HomePage() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
@@ -193,7 +194,7 @@ export default function HomePage() {
             <div
               key={index}
               className="bg-white shadow-lg rounded-lg overflow-hidden relative cursor-pointer"
-              onClick={() => focusOnPlace(shop)}
+              onClick={() => {window.location.href = `/detail/${shop.place_id}`;}}
             >
               <div className="relative">
                 <Image
@@ -212,14 +213,15 @@ export default function HomePage() {
                   <p className="text-gray-500">Total Ratings: {shop.user_ratings_total}</p>
                 )}
                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                  <a
-                    href={`/detail/${shop.place_id}`}
-                    className="text-blue-500"
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={`More details about ${shop.name}`}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      focusOnPlace(shop);
+                    }}
+                    aria-label={`Focus on ${shop.name} on the map`}
                   >
-                    More
-                  </a>
+                    <MapPin size={20} />
+                  </button>
                   <button
                     className="text-red-500"
                     onClick={(e) => {

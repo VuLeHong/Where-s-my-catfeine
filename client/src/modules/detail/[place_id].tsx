@@ -100,32 +100,6 @@ export default function DetailPage({ placeId }: DetailPageProps) {
             <button onClick={handlePopupOpen} ><Heart /></button>
           </div>
           {shopDetails.photos && shopDetails.photos.length > 0 && (
-            // <Swiper
-            //   modules={[Navigation, Pagination]}
-            //   navigation
-            //   pagination={{ clickable: true }}
-            //   spaceBetween={16}
-            //   slidesPerView={1}
-            //   loop={true}
-            //   autoplay={{
-            //     delay: 3000,
-            //     disableOnInteraction: true,
-            //   }}
-            //   speed={500}
-            //   className="rounded-lg w-full max-w-lg"
-            // >
-            //   {shopDetails.photos.map((photo, index) => (
-            //     <SwiperSlide key={index}>
-            //       <Image
-            //         src={photo.getUrl({ maxWidth: 450, maxHeight: 450 })}
-            //         alt={`${shopDetails.name} - Photo ${index + 1}`}
-            //         className="w-full h-auto object-cover rounded-lg"
-            //         width={400}
-            //         height={400}
-            //       />
-            //     </SwiperSlide>
-            //   ))}
-            // </Swiper>
             <Carousel
               opts={{
                 align: "start",
@@ -158,12 +132,12 @@ export default function DetailPage({ placeId }: DetailPageProps) {
         <section className="flex  flex-col gap-8">
           <div className="flex-1">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800">Address</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">Địa chỉ</h2>
               <p className="text-gray-600">{shopDetails.formatted_address || 'No description available.'}</p>
             </div>
             {openingHours && (
               <div className="mt-4">
-                <h2 className="text-2xl font-semibold text-gray-800">Opening Hours</h2>
+                <h2 className="text-2xl font-semibold text-gray-800">Giờ mở cửa</h2>
                 <p className="text-gray-600">
                   {openingHours.open?.time && openingHours.close?.time
                     ? `${formatTime(openingHours.open.time)} - ${formatTime(openingHours.close.time)}`
@@ -174,7 +148,17 @@ export default function DetailPage({ placeId }: DetailPageProps) {
           </div>
 
           <div className="flex-1 w-2/3">
-            <h2 className="text-2xl font-semibold text-gray-800">Reviews</h2>
+            <h2 className="text-2xl font-semibold text-gray-800">Nhận xét</h2>
+            {shopDetails.rating !== undefined ? (
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold text-yellow-500">
+                  {shopDetails.rating}⭐
+                </span>
+                <span className="text-gray-500">({shopDetails.user_ratings_total} đánh giá)</span>
+              </div>
+            ) : (
+              <p className="text-gray-500">No rating available</p>
+            )}
             {nonEmptyReviews.length > 0 ? (
               <ul className="space-y-4 mt-4">
                 {nonEmptyReviews.map((review, index) => (
