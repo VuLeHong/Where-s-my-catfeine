@@ -175,7 +175,7 @@ export default function DetailPage({ placeId }: DetailPageProps) {
 
           <div className="flex items-start justify-center w-1/3">
             {shopDetails.rating !== undefined ? (
-              <div className="flex flex-col items-center justify-center text-center space-y-2 bg-white px-10 py-4 md:px-10 md:py-6 sticky top-40 border-2 border-black rounded-lg">
+              <div className="flex flex-col items-center justify-center text-center space-y-2  bg-white px-20 py-4 m-10 sticky top-40 border-2 border-black rounded-lg">
                 <span className="font-semibold text-black text-3xl">
                   {shopDetails.rating}
                 </span>
