@@ -15,6 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { Star } from 'lucide-react';
 
 interface DetailPageProps {
   placeId: string;
@@ -129,55 +130,70 @@ export default function DetailPage({ placeId }: DetailPageProps) {
           )}
         </section>
 
-        <section className="flex  flex-col gap-8">
-          <div className="flex-1">
+        <section className="flex justify-between gap-8">
+          <div className="flex flex-col gap-8 flex-1">
             <div>
               <h2 className="text-2xl font-semibold text-gray-800">Địa chỉ</h2>
-              <p className="text-gray-600">{shopDetails.formatted_address || 'No description available.'}</p>
+              <p className="text-gray-600">
+                {shopDetails.formatted_address || 'No description available.'}
+              </p>
             </div>
+
             {openingHours && (
-              <div className="mt-4">
-                <h2 className="text-2xl font-semibold text-gray-800">Giờ mở cửa</h2>
-                <p className="text-gray-600">
-                  {openingHours.open?.time && openingHours.close?.time
-                    ? `${formatTime(openingHours.open.time)} - ${formatTime(openingHours.close.time)}`
-                    : 'Not available'}
-                </p>
-              </div>
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">Giờ mở cửa</h2>
+              <p className="text-gray-600">
+                {openingHours.open?.time && openingHours.close?.time
+                ? `${formatTime(openingHours.open.time)} - ${formatTime(openingHours.close.time)}`
+                : 'Not available'}
+              </p>
+            </div>
             )}
+
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">Nhận xét</h2>
+                {nonEmptyReviews.length > 0 ? (
+                  <ul className="space-y-4 mt-4">
+                  {nonEmptyReviews.map((review, index) => (
+                    <li key={index} className="bg-white p-4 rounded-lg shadow-md">
+                      <div className="flex items-center">
+                        <div className="flex items-center text-black text-xl font-semibold">
+                          {review.rating}
+                          <Star className="w-5 h-5 ml-1 text-black" />
+                        </div>
+                        <p className="ml-2 text-sm text-gray-500">{review.author_name}</p>
+                      </div>
+                      <p className="mt-2 text-gray-700">{review.text}</p>
+                    </li>
+                  ))}
+                  </ul>                
+                ) : (
+                  <p className="text-gray-500">No reviews available</p>
+                )}
+            </div>
           </div>
 
-          <div className="flex-1 w-2/3">
-            <h2 className="text-2xl font-semibold text-gray-800">Nhận xét</h2>
+          <div className="flex items-start justify-center w-1/3">
             {shopDetails.rating !== undefined ? (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold text-yellow-500">
-                  {shopDetails.rating}⭐
+              <div className="flex flex-col items-center justify-center text-center space-y-2 bg-white px-10 py-4 md:px-10 md:py-6 sticky top-40 border-2 border-black rounded-lg">
+                <span className="font-semibold text-black text-3xl">
+                  {shopDetails.rating}
                 </span>
-                <span className="text-gray-500">({shopDetails.user_ratings_total} đánh giá)</span>
+                <span className="flex items-center gap-1 text-black text-3xl">
+                  <Star/>
+                  <Star/>
+                  <Star/>
+                  <Star/>
+                  <Star/>
+                </span>
+                <span className="text-gray-500 text-lg">
+                  ({shopDetails.user_ratings_total} đánh giá)
+                </span>
               </div>
             ) : (
               <p className="text-gray-500">No rating available</p>
             )}
-            {nonEmptyReviews.length > 0 ? (
-              <ul className="space-y-4 mt-4">
-                {nonEmptyReviews.map((review, index) => (
-                  <li key={index} className="bg-white p-4 rounded-lg shadow-md">
-                    <div className="flex items-center">
-                      <div className="text-yellow-500">
-                        {review.rating}⭐
-                      </div>
-                      <p className="ml-2 text-sm text-gray-500">{review.author_name}</p>
-                    </div>
-                    <p className="mt-2 text-gray-700">{review.text}</p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">No reviews available</p>
-            )}
           </div>
-
         </section>
       </main>
 
