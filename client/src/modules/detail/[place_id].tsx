@@ -15,6 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { Star } from 'lucide-react';
 
 interface DetailPageProps {
   placeId: string;
@@ -100,32 +101,6 @@ export default function DetailPage({ placeId }: DetailPageProps) {
             <button onClick={handlePopupOpen} ><Heart /></button>
           </div>
           {shopDetails.photos && shopDetails.photos.length > 0 && (
-            // <Swiper
-            //   modules={[Navigation, Pagination]}
-            //   navigation
-            //   pagination={{ clickable: true }}
-            //   spaceBetween={16}
-            //   slidesPerView={1}
-            //   loop={true}
-            //   autoplay={{
-            //     delay: 3000,
-            //     disableOnInteraction: true,
-            //   }}
-            //   speed={500}
-            //   className="rounded-lg w-full max-w-lg"
-            // >
-            //   {shopDetails.photos.map((photo, index) => (
-            //     <SwiperSlide key={index}>
-            //       <Image
-            //         src={photo.getUrl({ maxWidth: 450, maxHeight: 450 })}
-            //         alt={`${shopDetails.name} - Photo ${index + 1}`}
-            //         className="w-full h-auto object-cover rounded-lg"
-            //         width={400}
-            //         height={400}
-            //       />
-            //     </SwiperSlide>
-            //   ))}
-            // </Swiper>
             <Carousel
               opts={{
                 align: "start",
@@ -155,45 +130,70 @@ export default function DetailPage({ placeId }: DetailPageProps) {
           )}
         </section>
 
-        <section className="flex  flex-col gap-8">
-          <div className="flex-1">
+        <section className="flex justify-between gap-8">
+          <div className="flex flex-col gap-8 flex-1">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-800">Address</h2>
-              <p className="text-gray-600">{shopDetails.formatted_address || 'No description available.'}</p>
+              <h2 className="text-2xl font-semibold text-gray-800">Địa chỉ</h2>
+              <p className="text-gray-600">
+                {shopDetails.formatted_address || 'No description available.'}
+              </p>
             </div>
+
             {openingHours && (
-              <div className="mt-4">
-                <h2 className="text-2xl font-semibold text-gray-800">Opening Hours</h2>
-                <p className="text-gray-600">
-                  {openingHours.open?.time && openingHours.close?.time
-                    ? `${formatTime(openingHours.open.time)} - ${formatTime(openingHours.close.time)}`
-                    : 'Not available'}
-                </p>
-              </div>
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">Giờ mở cửa</h2>
+              <p className="text-gray-600">
+                {openingHours.open?.time && openingHours.close?.time
+                ? `${formatTime(openingHours.open.time)} - ${formatTime(openingHours.close.time)}`
+                : 'Not available'}
+              </p>
+            </div>
             )}
-          </div>
 
-          <div className="flex-1 w-2/3">
-            <h2 className="text-2xl font-semibold text-gray-800">Reviews</h2>
-            {nonEmptyReviews.length > 0 ? (
-              <ul className="space-y-4 mt-4">
-                {nonEmptyReviews.map((review, index) => (
-                  <li key={index} className="bg-white p-4 rounded-lg shadow-md">
-                    <div className="flex items-center">
-                      <div className="text-yellow-500">
-                        {review.rating}⭐
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-800">Nhận xét</h2>
+                {nonEmptyReviews.length > 0 ? (
+                  <ul className="space-y-4 mt-4">
+                  {nonEmptyReviews.map((review, index) => (
+                    <li key={index} className="bg-white p-4 rounded-lg shadow-md">
+                      <div className="flex items-center">
+                        <div className="flex items-center text-black text-xl font-semibold">
+                          {review.rating}
+                          <Star className="w-5 h-5 ml-1 text-black" />
+                        </div>
+                        <p className="ml-2 text-sm text-gray-500">{review.author_name}</p>
                       </div>
-                      <p className="ml-2 text-sm text-gray-500">{review.author_name}</p>
-                    </div>
-                    <p className="mt-2 text-gray-700">{review.text}</p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">No reviews available</p>
-            )}
+                      <p className="mt-2 text-gray-700">{review.text}</p>
+                    </li>
+                  ))}
+                  </ul>                
+                ) : (
+                  <p className="text-gray-500">No reviews available</p>
+                )}
+            </div>
           </div>
 
+          <div className="flex items-start justify-center w-1/3">
+            {shopDetails.rating !== undefined ? (
+              <div className="flex flex-col items-center justify-center text-center space-y-2 bg-white px-10 py-4 md:px-10 md:py-6 sticky top-40 border-2 border-black rounded-lg">
+                <span className="font-semibold text-black text-3xl">
+                  {shopDetails.rating}
+                </span>
+                <span className="flex items-center gap-1 text-black text-3xl">
+                  <Star/>
+                  <Star/>
+                  <Star/>
+                  <Star/>
+                  <Star/>
+                </span>
+                <span className="text-gray-500 text-lg">
+                  ({shopDetails.user_ratings_total} đánh giá)
+                </span>
+              </div>
+            ) : (
+              <p className="text-gray-500">No rating available</p>
+            )}
+          </div>
         </section>
       </main>
 
