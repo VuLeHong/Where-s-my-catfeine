@@ -16,6 +16,9 @@ import com.example.server.model.dto.request.VerifyTokenRequest;
 import com.example.server.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 
 @RestController
@@ -26,12 +29,16 @@ public class AuthenController {
     AuthenticationService authenticationService;
 
     @PostMapping("/create-token")
-    public ApiReponse<AuthenticationDto> authenticate(@RequestBody AuthenticationRequest request) {
+    public ApiReponse<String> authenticate(@RequestBody AuthenticationRequest request,  HttpServletResponse response) {
 
         AuthenticationDto result = authenticationService.authenticate(request);
-        
-        return ApiReponse.<AuthenticationDto>builder()
-                .result(result)
+        Cookie authCookie = new Cookie("Token", result.token());
+        authCookie.setHttpOnly(true);
+        authCookie.setPath("/");  
+        authCookie.setMaxAge(1 * 24 * 60 * 60);
+        response.addCookie(authCookie);
+        return ApiReponse.<String>builder()
+                .message("Success")
                 .build();
     }
     

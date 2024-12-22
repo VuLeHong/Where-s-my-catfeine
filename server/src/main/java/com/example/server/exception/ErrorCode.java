@@ -9,7 +9,7 @@ public enum ErrorCode {
     // Define enum constants
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized Error"),
     INVALID_REQUEST(400, "Invalid request"),
-    UNAUTHENTICATED(401, "Unauthenticated"),
+    UNAUTHENTICATED(402, "Unauthenticated"),
     NOT_FOUND(404, "Resource not found"),
     INTERNAL_SERVER_ERROR(500, "Internal server error"),
     PASSWORD_INVALID(501, "Password must be at least 6 characters"),
