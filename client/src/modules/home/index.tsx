@@ -13,6 +13,7 @@ export default function HomePage({ token }: { token: string  | undefined }) {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [locationInMap, setLocationInMap] = useState<{ lat: number; lng: number } | null>(null);
   const [coffeeShops, setCoffeeShops] = useState<google.maps.places.PlaceResult[]>([]);
+  const [userData, setUserData] = useState<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
@@ -29,6 +30,7 @@ export default function HomePage({ token }: { token: string  | undefined }) {
 
         const data = await response.json();
         console.log(data);
+        setUserData(data.result);
       })();
     }
   }, [token]);
@@ -189,14 +191,27 @@ export default function HomePage({ token }: { token: string  | undefined }) {
               Tìm kiếm
             </button>
           </div>
-          <div className="flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-gray-800">
-              <Link href={'/signup'}>Đăng Ký</Link>
-            </button>
-            <button className="text-gray-600 hover:text-gray-800">
-              <Link href={'/login'}>Đăng Nhập</Link>
-            </button>
-          </div>
+          {userData ? (
+              <div className="flex items-center space-x-2">
+                <Image
+                  src="/avatar.png"
+                  alt="Avatar"
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+                <span className="text-gray-600">{userData.userEmail}</span>
+              </div>
+            ) : (
+              <>
+                <button className="text-gray-600 hover:text-gray-800">
+                  <Link href={'/signup'}>Đăng Ký</Link>
+                </button>
+                <button className="text-gray-600 hover:text-gray-800">
+                  <Link href={'/login'}>Đăng Nhập</Link>
+                </button>
+              </>
+            )}
           <Dropdown />
         </div>
       </header>
