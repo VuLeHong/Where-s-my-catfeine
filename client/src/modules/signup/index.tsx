@@ -2,21 +2,16 @@
 
 import Link from 'next/link';
 import React, { SyntheticEvent, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast"
 
 export default function SignupPage() {
+  const [userName, setName] = useState('');
+  const [userEmail, setEmail] = useState('');
+  const [userPassword, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast()
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-  });
-  const handleChange = () => {
-    
-    setFormData({ ...formData});
-  };
+
   const handleSubmit = async (e: SyntheticEvent) => {
     try {
       e.preventDefault();
@@ -25,7 +20,7 @@ export default function SignupPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({userName, userEmail, userPassword}),
       });
 
       if (!response.ok) {
@@ -36,10 +31,7 @@ export default function SignupPage() {
         title: "User was created ",
         description: "Your register success",
       })
-      setFormData({ username: '', email: '', password: '' });
-      setTimeout(() => {
-        router.push('/login');
-      }, 1500);
+      router.push('/login');
     } catch (err) {
       toast({
         title: "Registration failed",
@@ -60,8 +52,7 @@ export default function SignupPage() {
             <input
               type="text"
               id="username"
-              value={formData.username}
-              onChange={handleChange}
+              onChange={e => setName(e.target.value)}
               placeholder="Enter your username"
               className="w-full px-4 py-2 mt-1 border rounded-md text-black"
               required
@@ -74,8 +65,7 @@ export default function SignupPage() {
             <input
               type="email"
               id="email"
-              value={formData.email}
-              onChange={handleChange}
+              onChange={e => setEmail(e.target.value)}
               placeholder="Enter your email"
               className="w-full px-4 py-2 mt-1 border rounded-md text-black"
               required
@@ -88,8 +78,7 @@ export default function SignupPage() {
             <input
               type="password"
               id="password"
-              value={formData.password}
-              onChange={handleChange}
+              onChange={e => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="w-full px-4 py-2 mt-1 border rounded-md text-black"
               required

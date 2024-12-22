@@ -9,7 +9,6 @@ import { Heart } from "@/components/ui/Heart";
 import { Loader } from '@googlemaps/js-api-loader';
 import { MapPin } from 'lucide-react';
 
-
 export default function HomePage({ token }: { token: string  | undefined }) {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [locationInMap, setLocationInMap] = useState<{ lat: number; lng: number } | null>(null);
