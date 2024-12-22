@@ -8,7 +8,7 @@ export default function LoginPage() {
   const [userEmail, setEmail] = useState('');
   const [userPassword, setPassword] = useState('');
   const router = useRouter();
-    const { toast } = useToast()
+  const { toast } = useToast()
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -28,6 +28,7 @@ export default function LoginPage() {
         })
         return
       }
+      // console.log(response)
       const result = await response.json();
       if (result.message != "Success") {
         toast({
@@ -44,10 +45,13 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.log(err)
+      // const ans = await err.json();
+      // toast({
+        
+      //       title: "Login success",
+      //       description: err.message,
+      //     })
     }
-
-
-
   };
 
   return (
