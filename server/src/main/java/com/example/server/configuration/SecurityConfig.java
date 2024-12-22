@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;    
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,7 +17,9 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -35,7 +38,10 @@ public class SecurityConfig {
         http.oauth2ResourceServer(oauth2 ->
             oauth2.jwt(JwtConfigurer -> JwtConfigurer.decoder(jwtDecoder()))
         );
-        http.csrf(AbstractHttpConfigurer::disable);
+        http
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(Customizer.withDefaults())
+        ;
         return http.build();
     }
 
@@ -52,5 +58,18 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);
     }
+
+@Bean
+public CorsFilter corsFilter() {
+    CorsConfiguration corsConfig = new CorsConfiguration();
+    corsConfig.addAllowedOrigin("http://localhost:3000"); // Allow frontend origin
+    corsConfig.addAllowedHeader("*"); // Allow any headers
+    corsConfig.addAllowedMethod("*"); // Allow any HTTP methods
+    corsConfig.setAllowCredentials(true);
+    corsConfig.addAllowedOriginPattern("*"); 
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", corsConfig); // Apply to all endpoints
+    return new CorsFilter(source);
+}
 
 }

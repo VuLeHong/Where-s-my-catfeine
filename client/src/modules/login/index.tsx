@@ -2,30 +2,46 @@
 import Link from 'next/link';
 import React, { SyntheticEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import cookie from 'cookie';
+import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [userEmail, setEmail] = useState('');
+  const [userPassword, setPassword] = useState('');
   const router = useRouter();
+    const { toast } = useToast()
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
     try {
-      // Step 1: Generate JWT token by calling create-token endpoint
       const response = await fetch('http://localhost:8080/auth/create-token', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Invalid email or password');
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({userEmail, userPassword}), // or form data if applicable
+        credentials: 'include', // If you are sending cookies
+    })
+      if(!response.ok){
+        toast({
+          title: "Login failed",
+          description: "Fail to fetch",
+        })
+        return
       }
-
-      // Redirect to the home page
-      router.push('/home');
+      const result = await response.json();
+      if (result.message != "Success") {
+        toast({
+          title: "Login failed",
+          description: result.message,
+        })
+      }
+      else{
+        toast({
+          title: "Login success",
+          description: result.message,
+        })
+        await router.push('/');
+      }
     } catch (err) {
       console.log(err)
     }

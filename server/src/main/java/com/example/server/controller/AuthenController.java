@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.server.exception.AppException;
+import com.example.server.exception.ErrorCode;
 import com.example.server.model.dto.reponse.AuthenticationDto;
+import com.example.server.model.dto.reponse.TokenDto;
 import com.example.server.model.dto.reponse.VerifyTokenDto;
 import com.example.server.model.dto.request.ApiReponse;
 import com.example.server.model.dto.request.AuthenticationRequest;
@@ -43,10 +46,14 @@ public class AuthenController {
     }
     
     @PostMapping("/verify")
-    public ApiReponse<VerifyTokenDto> postMethodName(@RequestBody VerifyTokenRequest request) throws ParseException, JOSEException {
+    public ApiReponse<TokenDto> verifyUser(@RequestBody VerifyTokenRequest request) throws ParseException, JOSEException {
         VerifyTokenDto result = authenticationService.verifyToken(request);
-        return ApiReponse.<VerifyTokenDto>builder()
-                .result(result)
+        if(result.Valid() == false){
+            throw new AppException(ErrorCode.TOKEN_INVALID);
+        }
+        TokenDto user = authenticationService.getUserInfo(request);
+        return ApiReponse.<TokenDto>builder()
+                .result(user)
                 .build();
     }
     

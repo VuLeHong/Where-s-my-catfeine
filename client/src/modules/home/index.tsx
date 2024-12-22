@@ -9,7 +9,8 @@ import { Heart } from "@/components/ui/Heart";
 import { Loader } from '@googlemaps/js-api-loader';
 import { MapPin } from 'lucide-react';
 
-export default function HomePage() {
+
+export default function HomePage({ token }: { token: string  | undefined }) {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [locationInMap, setLocationInMap] = useState<{ lat: number; lng: number } | null>(null);
   const [coffeeShops, setCoffeeShops] = useState<google.maps.places.PlaceResult[]>([]);
@@ -17,6 +18,21 @@ export default function HomePage() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
+
+  useEffect(() => {
+    if (token) {
+      (async () => {
+        const response = await fetch("http://localhost:8080/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+        });
+
+        const data = await response.json();
+        console.log(data);
+      })();
+    }
+  }, [token]);
 
   useEffect(() => {
     const initializeMap = async () => {

@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 import com.example.server.exception.AppException;
 import com.example.server.exception.ErrorCode;
 import com.example.server.model.dto.reponse.AuthenticationDto;
+import com.example.server.model.dto.reponse.TokenDto;
 import com.example.server.model.dto.reponse.VerifyTokenDto;
 import com.example.server.model.dto.request.AuthenticationRequest;
 import com.example.server.model.dto.request.VerifyTokenRequest;
@@ -101,6 +102,18 @@ public class AuthenticationService {
             .build();
         
     }
+
+    public TokenDto getUserInfo(VerifyTokenRequest request) throws ParseException, JOSEException{
+        var token = request.token();
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        var claims = signedJWT.getJWTClaimsSet();
+        return TokenDto.builder()
+            .userEmail(claims.getSubject())
+            .userId(claims.getStringClaim("userId"))
+            .role(claims.getStringClaim("scope"))
+            .build();
+    }
+
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
         if(!CollectionUtils.isEmpty(user.getRoles())) {
@@ -108,4 +121,5 @@ public class AuthenticationService {
         }
         return stringJoiner.toString(); 
     }
+
 }

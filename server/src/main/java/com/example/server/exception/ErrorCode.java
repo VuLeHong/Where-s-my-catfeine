@@ -14,7 +14,9 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "Internal server error"),
     PASSWORD_INVALID(501, "Password must be at least 6 characters"),
     USER_EXISTED(505, "This Email has been used"),
+    TOKEN_INVALID(506, "This Token is invalid"),
     USER_NOT_EXISTED(503, "This User is not existed");
+
 
     private final int code; 
     private final String message; 
