@@ -18,39 +18,33 @@ export default function LoginPage() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({userEmail, userPassword}), // or form data if applicable
-        credentials: 'include', // If you are sending cookies
+        body: JSON.stringify({userEmail, userPassword}), 
+        credentials: 'include', 
     })
       if(!response.ok){
         toast({
           title: "Login failed",
           description: "Fail to fetch",
         })
-        return
       }
-      // console.log(response)
       const result = await response.json();
-      if (result.message != "Success") {
-        toast({
-          title: "Login failed",
-          description: result.message,
-        })
-      }
-      else{
+      console.log(result)
+      if (result.message === "Success") {
         toast({
           title: "Login success",
           description: result.message,
         })
         await router.push('/');
       }
-    } catch (err) {
-      console.log(err)
-      // const ans = await err.json();
-      // toast({
-        
-      //       title: "Login success",
-      //       description: err.message,
-      //     })
+      else{
+        toast({
+          title: "Login failed",
+          description: result.message,
+      })
+    }
+    } catch (error: unknown) {
+      console.log(error)
+
     }
   };
 

@@ -15,6 +15,7 @@ import com.example.server.model.dto.reponse.TokenDto;
 import com.example.server.model.dto.reponse.VerifyTokenDto;
 import com.example.server.model.dto.request.ApiReponse;
 import com.example.server.model.dto.request.AuthenticationRequest;
+import com.example.server.model.dto.request.LogoutRequest;
 import com.example.server.model.dto.request.VerifyTokenRequest;
 import com.example.server.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
@@ -56,5 +57,13 @@ public class AuthenController {
                 .result(user)
                 .build();
     }
+    @PostMapping("/logout")
+    public ApiReponse<Void> Logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        
+        authenticationService.logout(request);
+        return ApiReponse.<Void>builder()
+                .build();
+    }
+    
     
 }

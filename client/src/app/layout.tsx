@@ -1,4 +1,4 @@
-
+import { Toaster } from "@/components/ui/toaster"
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 
@@ -13,6 +13,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={font.className} suppressHydrationWarning={true}>
         {children}
+        <Toaster />
       </body>
     </html>
   );

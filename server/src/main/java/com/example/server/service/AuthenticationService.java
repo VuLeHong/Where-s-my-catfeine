@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +19,11 @@ import com.example.server.model.dto.reponse.AuthenticationDto;
 import com.example.server.model.dto.reponse.TokenDto;
 import com.example.server.model.dto.reponse.VerifyTokenDto;
 import com.example.server.model.dto.request.AuthenticationRequest;
+import com.example.server.model.dto.request.LogoutRequest;
 import com.example.server.model.dto.request.VerifyTokenRequest;
+import com.example.server.model.entity.InvalidToken;
 import com.example.server.model.entity.User;
+import com.example.server.repository.InvalidatedTokenRepository;
 import com.example.server.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -43,6 +47,8 @@ public class AuthenticationService {
     UserRepository userRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    InvalidatedTokenRepository invalidatedTokenRepository;
     @NonFinal
     @Value("${jwt.signer_key}")
     protected String SIGNER_KEY;
@@ -54,7 +60,7 @@ public class AuthenticationService {
         boolean authenticated = passwordEncoder.matches(request.userPassword(), user.getUserPassword());
         
         if(!authenticated){
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.WRONG_PASSWORD);
         }
         var token = generateToken(user);
         return  AuthenticationDto.builder()
@@ -71,6 +77,7 @@ public class AuthenticationService {
             .issueTime(new Date())
             .claim("userId", user.getUserId())
             .claim("scope", buildScope(user))
+            .jwtID(UUID.randomUUID().toString())
             .expirationTime(new Date(
                 Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()
             ))
@@ -91,16 +98,44 @@ public class AuthenticationService {
 
     public VerifyTokenDto verifyToken(VerifyTokenRequest request) throws ParseException, JOSEException{
         var token = request.token();
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+        boolean isValid = true;
+        try {
+            CheckToken(token);
+        } catch (AppException e) {
+            isValid = false;
+        }
 
+       return VerifyTokenDto.builder()
+            .Valid(isValid)
+            .build();
+        
+    }
+
+    public void logout(LogoutRequest request) throws ParseException, JOSEException{
+        var signToken = CheckToken(request.token());
+
+        String jwt = signToken.getJWTClaimsSet().getJWTID();
+        Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidToken invalidToken = InvalidToken.builder()
+            .id(jwt)
+            .expiryTime(expiryTime)
+            .build();
+        invalidatedTokenRepository.save(invalidToken);
+        
+    }
+
+    private SignedJWT CheckToken(String token) throws ParseException, JOSEException{
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token); 
         Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
        var verified = signedJWT.verify(verifier);
-
-       return VerifyTokenDto.builder()
-            .Valid(verified && expiryTime.after(new Date()))
-            .build();
-        
+       if(!(verified && expiryTime.after(new Date())))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+            throw new AppException(ErrorCode.TOKEN_INVALID);
+        }
+        return signedJWT;
     }
 
     public TokenDto getUserInfo(VerifyTokenRequest request) throws ParseException, JOSEException{
