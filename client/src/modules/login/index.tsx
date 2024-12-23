@@ -28,7 +28,6 @@ export default function LoginPage() {
         })
       }
       const result = await response.json();
-      console.log(result)
       if (result.message === "Success") {
         toast({
           title: "Login success",

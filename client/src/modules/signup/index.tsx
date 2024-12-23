@@ -22,20 +22,29 @@ export default function SignupPage() {
         },
         body: JSON.stringify({userName, userEmail, userPassword}),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Registration failed');
       }
-      toast({
-        title: "User was created ",
-        description: "Your register success",
-      })
-      router.push('/login');
-    } catch (err) {
+      const result = await response.json();
+      if(result.code === 0){
+        toast({
+          title: "User was created ",
+          description: "Your register success",
+        })
+        router.push('/login');
+      }
+      else{
+        toast({
+          title: "Registration failed",
+          description: result.message,
+        })
+      }
+      
+    } catch (err: unknown) {
       toast({
         title: "Registration failed",
-        description: "Something was wrong in register",
+        description: err instanceof Error ? err.message : 'An unknown error occurred',
       })
       console.log(err);
     }
