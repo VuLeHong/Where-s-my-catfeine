@@ -14,10 +14,14 @@ export default function HomePage({ token }: { token: string  | undefined }) {
   const [locationInMap, setLocationInMap] = useState<{ lat: number; lng: number } | null>(null);
   const [coffeeShops, setCoffeeShops] = useState<google.maps.places.PlaceResult[]>([]);
   const [userData, setUserData] = useState<any>(null);
+  const [userToken, setUserToken] = useState<any>(null);
+  const [userId, setUserId] = useState<any>(null);
+  const [userWishlist, setUserWishlist] = useState<any[]>([]);
   const mapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
 
   useEffect(() => {
     if (token) {
@@ -29,11 +33,28 @@ export default function HomePage({ token }: { token: string  | undefined }) {
         });
 
         const data = await response.json();
-        console.log(data);
+        setUserToken(token);
         setUserData(data.result);
       })();
     }
   }, [token]);
+
+  useEffect(() => {
+    if (userData?.userId && userToken) {
+      (async () => {
+          const response = await fetch(`http://localhost:8080/user/get/${userData.userId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userToken}`,
+            },
+          });
+          const data = await response.json();
+          setUserId(data.userId)
+          setUserWishlist(data.wishList)
+      })();
+    }
+  }, [userData?.userId, userToken]);
 
   useEffect(() => {
     const initializeMap = async () => {
@@ -116,7 +137,6 @@ export default function HomePage({ token }: { token: string  | undefined }) {
         (results, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             setCoffeeShops(results);
-
             results.forEach((place) => {
               if (place.geometry && place.geometry.location) {
                 const marker = new google.maps.Marker({
@@ -257,6 +277,7 @@ export default function HomePage({ token }: { token: string  | undefined }) {
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsWishlistOpen(true);
+                      setSelectedPlaceId(shop.place_id || null);
                     }}
                   >
                     <Heart />
@@ -275,7 +296,14 @@ export default function HomePage({ token }: { token: string  | undefined }) {
           <p>&copy; 2024 Where is my cafein. All rights reserved.</p>
         </div>
       </footer>
-      <WishlistPopup isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
+      <WishlistPopup
+        isOpen={isWishlistOpen}
+        onClose={() => setIsWishlistOpen(false)}
+        userWishlist={userWishlist}
+        userToken={userToken}
+        userId={userId}
+        placeId={selectedPlaceId}
+      />
     </div>
     );
   }
