@@ -1,15 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, SyntheticEvent } from "react";
+import { useToast } from "@/hooks/use-toast"
 
 interface WishlistPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  placeId?: string;  // Thêm placeId vào props nếu cần
+  userWishlist: { collectionId: string; name: string; count: number }[];
+  userToken: string
+  userId: string
+  placeId: string | null
 }
 
-export function WishlistPopup({ isOpen, onClose, placeId }: WishlistPopupProps) {
+export function WishlistPopup({ isOpen, onClose, userWishlist, userToken, userId, placeId }: WishlistPopupProps) {
   const popupRef = useRef<HTMLDivElement | null>(null);
   const [isCreatePopupOpen, setCreatePopupOpen] = useState(false);
-  const [newWishlistName, setNewWishlistName] = useState("");
+  const [name, setName] = useState("");
+  const { toast } = useToast()
 
   useEffect(() => {
     if (isOpen || isCreatePopupOpen) {
@@ -34,12 +39,81 @@ export function WishlistPopup({ isOpen, onClose, placeId }: WishlistPopupProps) 
     onClose();
   };
 
-  const handleCreateSubmit = () => {
-    alert(`New Wishlist Created: ${newWishlistName}`);
+  const handleCreateSubmit = async (e: SyntheticEvent) => {
+
+    try {
+      e.preventDefault();
+      const response = await fetch(`http://localhost:8080/collection/create/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({name}),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create a new wishlist");
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
     setCreatePopupOpen(false);
-    setNewWishlistName("");
     onClose();
   };
+
+  const handleDeleteWishlist = async (e: SyntheticEvent, id: string) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:8080/collection/delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete wishlist");
+      }
+  
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Failed to delete wishlist." });
+    }
+  }
+
+  const handleAddCoffeeToWishlist = async (
+    e: SyntheticEvent,
+    collectionId: string,
+    coffeeId: string | null
+  ) => {
+    e.stopPropagation();
+  
+    try {
+      const response = await fetch(
+        `http://localhost:8080/collection/add-coffee/${collectionId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+          body: JSON.stringify({
+            coffeeId: placeId,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to add coffee shop to wishlist");
+        }
+  
+    } catch (error) {
+      console.error("Error adding coffee to wishlist:", error);
+    }
+  };
+  
 
   const handleCloseCreatePopup = () => {
     setCreatePopupOpen(false);
@@ -71,15 +145,32 @@ export function WishlistPopup({ isOpen, onClose, placeId }: WishlistPopupProps) 
             </h3>
 
             <ul className="mt-4 space-y-4 w-full">
-              {[{ id: 1, name: "Favorites", count: 3 }, { id: 2, name: "Dream Destinations", count: 5 }, { id: 3, name: "Weekend Getaways", count: 2 }].map((wishlist) => (
-                <li
-                  key={wishlist.id}
-                  className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer"
-                >
-                  <span className="text-gray-700">{wishlist.name}</span>
-                  <span className="text-sm text-gray-500">{wishlist.count} saved</span>
-                </li>
-              ))}
+            {userWishlist.length > 0 ? (
+              userWishlist.map((wishlist, index) => (
+              <li
+                key={index}
+                className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer"
+              >
+                <span className="text-gray-700">{wishlist.name}</span>
+                <div className="flex items-center">
+                  <button
+                    onClick={(e: SyntheticEvent) => handleAddCoffeeToWishlist(e, wishlist.collectionId, placeId)}
+                    className="text-green-500 hover:text-green-700 font-bold ml-4 text-xl hover:bg-green-200 p-2 rounded-full transition-all"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={(e: SyntheticEvent) => handleDeleteWishlist(e, wishlist.collectionId)}
+                    className="text-red-500 hover:text-red-700 font-bold ml-4 text-xl hover:bg-red-200 p-2 rounded-full transition-all"
+                  >
+                    x
+                  </button>
+                </div>
+              </li>              
+              ))
+            ) : (
+              <p className="text-gray-500 text-center">No items in your wishlist yet.</p>
+            )}
             </ul>
 
             <button
@@ -111,20 +202,22 @@ export function WishlistPopup({ isOpen, onClose, placeId }: WishlistPopupProps) 
               Create New Wishlist
             </h3>
 
-            <input
-              type="text"
-              value={newWishlistName}
-              onChange={(e) => setNewWishlistName(e.target.value)}
-              placeholder="Enter wishlist name"
-              className="w-full p-3 border border-gray-300 rounded-lg mb-4 text-black"
-            />
+            <form>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter wishlist name"
+                className="w-full p-3 border border-gray-300 rounded-lg mb-4 text-black"
+              />
 
-            <button
-              onClick={handleCreateSubmit}
-              className="w-full py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
-            >
-              Create Wishlist
-            </button>
+              <button
+                onClick={handleCreateSubmit}
+                className="w-full py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+              >
+                Create Wishlist
+              </button>
+            </form>
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Dropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,10 +12,6 @@ export default function Dropdown() {
 
   const handleLogout = () => {
     console.log("Logout");
-  };
-
-  const handleFavorites = () => {
-    console.log("Favorites");
   };
 
   return (
@@ -31,11 +28,8 @@ export default function Dropdown() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
           <div className="p-2">
-            <button
-              onClick={handleFavorites}
-              className="w-full text-left p-2 text-gray-700 hover:bg-gray-100"
-            >
-              Favorites
+            <button className="w-full text-left p-2 text-gray-700 hover:bg-gray-100">
+              <Link href={'/favorite'}>Favorite</Link>
             </button>
             <button
               onClick={handleLogout}

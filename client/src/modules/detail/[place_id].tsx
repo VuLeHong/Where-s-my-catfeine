@@ -202,12 +202,6 @@ export default function DetailPage({ placeId }: DetailPageProps) {
           <p>&copy; 2024 Where is my cafein. All rights reserved.</p>
         </div>
       </footer>
-
-      <WishlistPopup
-        isOpen={isPopupOpen}
-        onClose={handlePopupClose}
-        placeId={placeId}
-      />
     </div>
   );
 }
