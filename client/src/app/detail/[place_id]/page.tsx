@@ -1,10 +1,12 @@
-"use client"
-
-import { useParams } from 'next/navigation';
 import DetailPage from '@/modules/detail/[place_id]';
+import { cookies } from 'next/headers';
 
-export default function Detail() {
-  const { place_id } = useParams();
+export default async function Detail() {
 
-  return place_id ? <DetailPage placeId={place_id as string} /> : <p>Loading...</p>;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('Token')?.value;
+
+  return (
+    <DetailPage token={token} />
+  );
 }
