@@ -8,20 +8,30 @@ import { WishlistPopup } from "../wishlist_popup";
 import { Heart } from "@/components/ui/Heart";
 import { Loader } from '@googlemaps/js-api-loader';
 import { MapPin } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast"
 
-export default function HomePage({ token }: { token: string  | undefined }) {
+interface User {
+  userId: number,
+  userName: string,
+  userEmail: string,
+  roles: [],
+  wishList: []
+  createdAt: Date,
+}
+
+export default function HomePage({ token }: { token: string | undefined }) {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [locationInMap, setLocationInMap] = useState<{ lat: number; lng: number } | null>(null);
   const [coffeeShops, setCoffeeShops] = useState<google.maps.places.PlaceResult[]>([]);
-  const [userData, setUserData] = useState<any>(null);
-  const [userToken, setUserToken] = useState<any>(null);
-  const [userId, setUserId] = useState<any>(null);
-  const [userWishlist, setUserWishlist] = useState<any[]>([]);
+  const [userData, setUserData] = useState<User | null>(null);
+  const [userToken, setUserToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const { toast } = useToast()
 
   useEffect(() => {
     if (token) {
@@ -42,16 +52,15 @@ export default function HomePage({ token }: { token: string  | undefined }) {
   useEffect(() => {
     if (userData?.userId && userToken) {
       (async () => {
-          const response = await fetch(`http://localhost:8080/user/get/${userData.userId}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userToken}`,
-            },
-          });
-          const data = await response.json();
-          setUserId(data.userId)
-          setUserWishlist(data.wishList)
+        const response = await fetch(`http://localhost:8080/user/get/${userData.userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+        const data = await response.json();
+        setUserId(data.userId)
       })();
     }
   }, [userData?.userId, userToken]);
@@ -159,8 +168,8 @@ export default function HomePage({ token }: { token: string  | undefined }) {
                       ${place.rating ? `<p>Rating: ${place.rating}</p>` : ''}
                       ${place.user_ratings_total ? `<p>Total Ratings: ${place.user_ratings_total}</p>` : ''}
                       ${place.opening_hours && place.opening_hours.isOpen()
-                        ? `<p>Status: Open Now</p>`
-                        : `<p>Status: Closed</p>`}
+                      ? `<p>Status: Open Now</p>`
+                      : `<p>Status: Closed</p>`}
                     </div>
                   `;
 
@@ -196,9 +205,9 @@ export default function HomePage({ token }: { token: string  | undefined }) {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col relative">
       <header className="bg-white p-4 shadow-md z-10">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
+        <div className="max-w-6xl mx-auto flex justify-around items-center">
           <div className="text-xl font-bold text-red-500">
-            <Link href={"/"}>Where is my cafein</Link>
+            <Link href={"/"}>Where is my catfeine</Link>
           </div>
           <div className="flex items-center space-x-4">
             <input
@@ -212,80 +221,88 @@ export default function HomePage({ token }: { token: string  | undefined }) {
             </button>
           </div>
           {userData ? (
-              <div className="flex items-center space-x-2">
-                <Image
-                  src="/avatar.png"
-                  alt="Avatar"
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-                <span className="text-gray-600">{userData.userEmail}</span>
-              </div>
-            ) : (
-              <>
-                <button className="text-gray-600 hover:text-gray-800">
-                  <Link href={'/signup'}>Đăng Ký</Link>
-                </button>
-                <button className="text-gray-600 hover:text-gray-800">
-                  <Link href={'/login'}>Đăng Nhập</Link>
-                </button>
-              </>
-            )}
-          <Dropdown />
+            <div className="flex items-center space-x-2">
+              <Image
+                src="/avatar.png"
+                alt="Avatar"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <span className="text-gray-600">{userData.userEmail}</span>
+              <Dropdown token={token} />
+            </div>
+          ) : (
+            <>
+              <button className="text-gray-600 hover:text-gray-800">
+                <Link href={'/signup'}>Đăng Ký</Link>
+              </button>
+              <button className="text-gray-600 hover:text-gray-800">
+                <Link href={'/login'}>Đăng Nhập</Link>
+              </button>
+            </>
+          )}
+
         </div>
       </header>
-        
+
       <main className="flex-grow py-8 bg-gray-200 flex">
         <div className="w-2/5 p-4 overflow-y-auto h-[calc(100vh-64px)]">
           <h2 className="text-3xl font-semibold mb-8 text-black">Nổi bật</h2>
           <div className="space-y-6">
-          {coffeeShops.map((shop, index) => (
-            <div
-              key={index}
-              className="bg-white shadow-lg rounded-lg overflow-hidden relative cursor-pointer"
-              onClick={() => {window.location.href = `/detail/${shop.place_id}`;}}
-            >
-              <div className="relative">
-                <Image
-                  src={getPlaceImageUrl(shop.photos)}
-                  alt={`Image of ${shop.name}`}
-                  width={700}
-                  height={700}
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-black font-semibold">{shop.name}</h3>
-                <p className="text-gray-500">{shop.vicinity}</p>
-                {shop.rating && <p className="text-gray-500">Rating: {shop.rating}</p>}
-                {shop.user_ratings_total && (
-                  <p className="text-gray-500">Total Ratings: {shop.user_ratings_total}</p>
-                )}
-                <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      focusOnPlace(shop);
-                    }}
-                    aria-label={`Focus on ${shop.name} on the map`}
-                  >
-                    <MapPin size={20} />
-                  </button>
-                  <button
-                    className="text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsWishlistOpen(true);
-                      setSelectedPlaceId(shop.place_id || null);
-                    }}
-                  >
-                    <Heart />
-                  </button>
+            {coffeeShops.map((shop, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-lg rounded-lg overflow-hidden relative cursor-pointer"
+                onClick={() => { window.location.href = `/detail/${shop.place_id}`; }}
+              >
+                <div className="relative">
+                  <Image
+                    src={getPlaceImageUrl(shop.photos)}
+                    alt={`Image of ${shop.name}`}
+                    width={700}
+                    height={700}
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-black font-semibold">{shop.name}</h3>
+                  <p className="text-gray-500">{shop.vicinity}</p>
+                  {shop.rating && <p className="text-gray-500">Rating: {shop.rating}</p>}
+                  {shop.user_ratings_total && (
+                    <p className="text-gray-500">Total Ratings: {shop.user_ratings_total}</p>
+                  )}
+                  <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        focusOnPlace(shop);
+                      }}
+                      aria-label={`Focus on ${shop.name} on the map`}
+                    >
+                      <MapPin size={20} />
+                    </button>
+                    <button
+                      className="text-red-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        if (!userData) {
+                          toast({
+                            title: 'Please login to add to wishlist',
+                          })
+                        } else {
+                          setIsWishlistOpen(true);
+                          setSelectedPlaceId(shop.place_id || null);
+                        }
+                      }}
+                    >
+                      <Heart />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
         <div ref={mapRef} className="w-3/5 p-4" />
@@ -299,11 +316,11 @@ export default function HomePage({ token }: { token: string  | undefined }) {
       <WishlistPopup
         isOpen={isWishlistOpen}
         onClose={() => setIsWishlistOpen(false)}
-        userWishlist={userWishlist}
+        onOpen={() => setIsWishlistOpen(true)}
         userToken={userToken}
         userId={userId}
         placeId={selectedPlaceId}
       />
     </div>
-    );
-  }
+  );
+}
