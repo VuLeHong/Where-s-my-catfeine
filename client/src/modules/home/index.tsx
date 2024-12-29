@@ -41,7 +41,6 @@ export default function HomePage({ token }: { token: string | undefined }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
         });
-
         const data = await response.json();
         setUserToken(token);
         setUserData(data.result);

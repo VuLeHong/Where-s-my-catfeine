@@ -56,14 +56,14 @@ public class UserService {
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_USER')")
     public UserDto getUser(String id){
         return userMapper.toUserDto(userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("User not found")));
+        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
     //updatePassword
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_USER')")
     public UserDto updatePassword(String userId, UserPasswordUpdateRequest request){
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userMapper.updatePassword(user, request);
         return userMapper.toUserDto(userRepository.save(user));
     }

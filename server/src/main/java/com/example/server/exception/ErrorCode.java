@@ -21,6 +21,7 @@ public enum ErrorCode {
     TOKEN_INVALID(506, "This Token is invalid", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(503, "This User is not existed", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED(507, "You do not have permission", HttpStatus.FORBIDDEN),
+    EXISTED_DATA(508, "This data is existed", HttpStatus.BAD_REQUEST),
     ;
 
 

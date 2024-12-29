@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import com.example.server.exception.AppException;
+import com.example.server.exception.ErrorCode;
 import com.example.server.mapper.CollectionMapper;
 import com.example.server.mapper.UserMapper;
 import com.example.server.model.dto.reponse.CollectionDto;
@@ -39,7 +41,7 @@ public class CollectionService {
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_USER')")
     public UserDto createCollection(String userId, CollectionCreateRequest request){
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Collection collection = collectionMapper.createCollection(request);
         collection.setUser(user);
         collectionRepository.save(collection);
@@ -53,8 +55,13 @@ public class CollectionService {
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_USER')")
     public CollectionDto addCoffeeId(String collectionId, CoffeeAddRequest request){
         Collection collection = collectionRepository.findById(collectionId)
-            .orElseThrow(() -> new RuntimeException("Collection not found"));
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
         List<String> CoffeeIds = collection.getCoffeeIds(); 
+        String itemToFind = request.coffeeId();
+        boolean found = CoffeeIds.stream().anyMatch(CoffeeId -> CoffeeId.equalsIgnoreCase(itemToFind));
+        if(found){
+            throw new AppException(ErrorCode.EXISTED_DATA);
+        }
         CoffeeIds.add(request.coffeeId());
         collection.setCoffeeIds(CoffeeIds);
         return collectionMapper.CollectionDto(collectionRepository.save(collection));
@@ -64,7 +71,7 @@ public class CollectionService {
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_USER')")
     public void deleteCollection(String collectionId){
         Collection collection = collectionRepository.findById(collectionId)
-            .orElseThrow(() -> new RuntimeException("Collection not found"));
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
         User user = collection.getUser();
         user.getWishList().remove(collection);
         userRepository.save(user);
@@ -75,7 +82,7 @@ public class CollectionService {
     @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_USER')")
     public CollectionDto deleteCoffeeId(String collectionId, CoffeeIdDeleteRequest request){
         Collection collection = collectionRepository.findById(collectionId)
-            .orElseThrow(() -> new RuntimeException("Collection not found"));
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
         List<String> CoffeeIds = collection.getCoffeeIds();
         CoffeeIds.remove(request.coffeeId());
         collection.setCoffeeIds(CoffeeIds);
