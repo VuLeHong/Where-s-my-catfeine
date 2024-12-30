@@ -1,33 +1,12 @@
-"use client";
-
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { DetailCollectionPage } from '@/modules/detail_collection/[collection_id]';
+import { cookies } from 'next/headers';
 
-export default function DetailCollection () {
-  const params = useParams();
-  const collection_id = typeof params.collection_id === 'string' ? params.collection_id : undefined;
-  const [token, setToken] = useState<string | null>(null);
+export default async function DetailCollection() {
 
-  useEffect(() => {
-    const fetchTokenAndCollectionId = async () => {
-      const res = await fetch(`/api/collection/${collection_id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setToken(data.token);
-      } else {
-        console.error('Error fetching token and collectionId');
-      }
-    };
-
-    if (collection_id) {
-      fetchTokenAndCollectionId();
-    }
-  }, [collection_id]);
-
-  if (!token) return <p>Loading...</p>;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('Token')?.value;
 
   return (
-    <DetailCollectionPage token={token} collectionId={collection_id} />
+    <DetailCollectionPage token={token} />
   );
 };
