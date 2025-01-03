@@ -51,7 +51,8 @@ public class SecurityConfig {
 @Bean
 public CorsFilter corsFilter() {
     CorsConfiguration corsConfig = new CorsConfiguration();
-    corsConfig.addAllowedOrigin("http://localhost:3000"); // Allow frontend origin
+    corsConfig.addAllowedOrigin("http://localhost:3000"); // Allow frontend origin (local development)
+    corsConfig.addAllowedOrigin("https://where-s-my-catfeine.vercel.app"); // Vercel frontend URL
     corsConfig.addAllowedHeader("*"); // Allow any headers
     corsConfig.addAllowedMethod("*"); // Allow any HTTP methods
     corsConfig.setAllowCredentials(true);

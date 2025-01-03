@@ -26,6 +26,4 @@ public interface UserMapper {
     @Mapping(target = "wishList", ignore = true)
     @Mapping(target = "roles", ignore = true)
     void updatePassword(@MappingTarget User user, UserPasswordUpdateRequest request);
-    
-
 }
