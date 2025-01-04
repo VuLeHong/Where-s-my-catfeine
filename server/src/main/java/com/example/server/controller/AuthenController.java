@@ -38,9 +38,11 @@ public class AuthenController {
         AuthenticationDto result = authenticationService.authenticate(request);
         Cookie authCookie = new Cookie("Token", result.token());
         authCookie.setHttpOnly(true);
+        authCookie.setSecure(true);
         authCookie.setPath("/");  
         authCookie.setMaxAge(1 * 24 * 60 * 60);
         response.addCookie(authCookie);
+        response.setHeader("Set-Cookie", "Token=" + result.token() + "; HttpOnly; Secure; Path=/; Max-Age=" + (1 * 24 * 60 * 60) + "; SameSite=None");
         return ApiReponse.<String>builder()
                 .message("Success")
                 .build();

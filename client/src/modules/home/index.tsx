@@ -44,6 +44,8 @@ export default function HomePage({ token }: { token: string | undefined }) {
         const data = await response.json();
         setUserToken(token);
         setUserData(data.result);
+        console.log(data.result);
+        console.log(token);
       })();
     }
   }, [token]);

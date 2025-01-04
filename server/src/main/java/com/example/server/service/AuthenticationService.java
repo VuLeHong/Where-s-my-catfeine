@@ -83,7 +83,7 @@ public class AuthenticationService {
             ))
             .build();
         
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject()); 
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {

@@ -43,7 +43,6 @@ export default function LoginPage() {
     }
     } catch (error: unknown) {
       console.log(error)
-
     }
   };
 
