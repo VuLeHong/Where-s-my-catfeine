@@ -1,0 +1,21 @@
+# Ignore build output except for the JAR file
+bin/
+build/
+
+# Ignore version control directories
+.git/
+.gitignore
+*.swp
+*.swo
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.out
+*.class
+*.DS_Store
+
+# Ignore IDE and editor-specific files
+.vscode/
+.idea/
+*.iml

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['maps.googleapis.com'],
   },
+  output: "standalone",
 }
 
 export default nextConfig;
